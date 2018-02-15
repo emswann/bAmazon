@@ -72,9 +72,72 @@ var addInventory = dbConnect => {
     .catch(error => console.log(error));
 };
 
-var addProduct = dbConnect => {
+var addProduct = dbConnect =>
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'product',
+      message: 'Enter the product name:\n'
+    }
+  ])
+  .then(answer => {
+    var product_name, department_name, price, stock_quantity;
+    
+    product_name = answer.product;
 
-};
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'department',
+        message: 'Enter the product department\n'
+      }
+    ])
+    .then(answer => {
+      department_name = answer.department;
+
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'price',
+          message: 'Enter the product cost:\n',
+          validate: value =>
+            (isNaN(value) === false && parseInt(value) > 0) 
+            || '\nYou have to input a valid number.\n'
+        }
+      ])
+      .then(answer => {
+        price = answer.price;
+
+        inquirer.prompt([
+          {
+            type: 'input',
+            name: 'amount',
+            message: 'Enter the number of products available:\n',
+            validate: value =>
+              (isNaN(value) === false && parseInt(value) > 0) 
+              || '\nYou have to input a valid number.\n'
+          }
+        ])
+        .then(answer => {
+          stock_quantity = answer.amount;
+
+          var objData = {
+            product_name:    product_name,
+            department_name: department_name,
+            price:           price,
+            stock_quantity:  stock_quantity
+          };
+
+          return db.insertProduct(dbConnect, objData)
+            .then(updateRes =>
+              console.log('\n' + updateRes.affectedRows + ' item inserted!\n')
+            );
+        })
+        .then(() => promptUser(dbConnect));
+      });
+    });
+  })
+  .catch(error => console.log(error));
 
 var promptUser = dbConnect => {
   var arrActions = ['View Products for Sale', 'View Low Inventory',

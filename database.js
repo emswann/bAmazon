@@ -61,8 +61,7 @@ var getConnection = () =>
 
 var endConnection = connection =>
   new Promise((resolve, reject) =>
-    connection.end(err => err ? reject(err) : resolve(1)
-    )
+    connection.end(err => err ? reject(err) : resolve(1))
   );
 
 var getProducts = connection =>
@@ -92,10 +91,20 @@ var updateInventory = (connection, arrParams, operator) =>
     )
   );
 
+var insertProduct = (connection, objData) =>
+  new Promise((resolve, reject) =>
+    connection.query(
+      'INSERT INTO products SET ?',
+      objData,
+      (err, res) => err ? reject(err) : resolve(res)
+    )
+  );
+
 module.exports = {
   getConnection,
   endConnection,
   getProducts,
   getLowInventory,
-  updateInventory
+  updateInventory,
+  insertProduct
 };
