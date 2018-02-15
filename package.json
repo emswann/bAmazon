@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Amazon-like Storefront Management System",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emswann/bAmazon.git"
+  },
+  "keywords": [
+    "node",
+    "bamazon"
+  ],
+  "author": "Elaina M. Swann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emswann/bAmazon/issues"
+  },
+  "homepage": "https://github.com/emswann/bAmazon#readme",
+  "dependencies": {
+    "easy-table": "^1.1.1",
+    "inquirer": "^5.1.0",
+    "mysql": "^2.15.0"
+  }
+}
