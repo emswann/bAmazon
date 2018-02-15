@@ -5,9 +5,8 @@ var util     = require('./util');
 
 var resolveQuit = (dbConnect, orders) => 
   Promise.all(orders.map(order => {
-    var arrParams = [order.nItems, 
-                     order.item_id
-                    ];
+    var arrParams = [order.nItems, order.item_id];
+    
     return db.updateStock(dbConnect, arrParams, true).then(updateRes =>
       console.log('\n' + updateRes.affectedRows + ' item updated!\n')
     );
@@ -63,9 +62,7 @@ var processOrder = (dbConnect, products, orders) => {
               });
 
             chosenProd.stock_quantity -= nAmount;
-            var arrParams = [nAmount, 
-                             chosenProd.item_id
-                            ];
+            var arrParams = [nAmount, chosenProd.item_id];
 
             return db.updateStock(dbConnect, arrParams, false).then(updateRes =>
               console.log('\n' + updateRes.affectedRows + ' item updated!\n')

@@ -73,6 +73,15 @@ var getProducts = connection =>
     )
   );
 
+var getLowInventory = (connection, arrParams) =>
+  new Promise((resolve, reject) =>
+    connection.query(
+      'SELECT * FROM products WHERE stock_quantity < ? ORDER BY item_id',
+      arrParams,
+      (err, res) => err ? reject(err) : resolve(res)
+    )
+  );
+
 var updateStock = (connection, arrParams, isAdd = false) =>
   new Promise((resolve, reject) => 
     connection.query(
@@ -87,5 +96,6 @@ module.exports = {
   getConnection,
   endConnection,
   getProducts,
+  getLowInventory,
   updateStock
 };

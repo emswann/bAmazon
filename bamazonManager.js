@@ -3,16 +3,23 @@ var inquirer = require('inquirer');
 var db       = require('./database');
 var util     = require('./util');
 
-var viewProducts = (dbConnect) => {
+var viewProducts = dbConnect => {
   console.log('\n\nYour list of products for sale:\n');
 
-  db.getProducts(dbConnect).then(products => util.printProducts(products, true)
-  )
-  .then(() => promptUser(dbConnect));
+  db.getProducts(dbConnect)
+    .then(products => util.printProducts(products, true))
+    .then(() => promptUser(dbConnect));
 };
 
 var viewInventory = dbConnect => {
+  const LIMIT = 5;
+  console.log('\n\nYour list of products with low inventory:\n');
 
+  var arrParams = [LIMIT];
+
+  db.getLowInventory(dbConnect, arrParams)
+    .then(products => util.printProducts(products, true))
+    .then(() => promptUser(dbConnect));
 };
 
 var addInventory = dbConnect => {
