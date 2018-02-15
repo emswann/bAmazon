@@ -4,7 +4,7 @@ var db       = require('./database');
 var util     = require('./util');
 
 var processOrder = (dbConnect, products, orders) => {
-  util.printProducts(products);
+  util.printProducts(products, false);
   inquirer.prompt([
     {
       type: 'input',
