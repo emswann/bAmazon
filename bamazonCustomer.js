@@ -3,6 +3,16 @@ var inquirer = require('inquirer');
 var db       = require('./database');
 var util     = require('./util');
 
+var resolveQuit = (dbConnect, orders) => 
+  Promise.all(orders.map(order => {
+    var arrParams = [order.nItems, 
+                     order.item_id
+                    ];
+    return db.updateStock(dbConnect, arrParams, true).then(updateRes =>
+      console.log('\n' + updateRes.affectedRows + ' item updated!\n')
+    );
+  }));
+
 var processOrder = (dbConnect, products, orders) => {
   util.printProducts(products, false);
   inquirer.prompt([
@@ -21,8 +31,10 @@ var processOrder = (dbConnect, products, orders) => {
 
     switch (nProduct) {
       case 0:
-        console.log('\nDisconnected as id ' + dbConnect.threadId);
-        db.endConnection(dbConnect);
+        return resolveQuit(dbConnect, orders).then(() => {
+          console.log('\nDisconnected as id ' + dbConnect.threadId);
+          db.endConnection(dbConnect);
+        });
         break;
       default:
         chosenProd = products[nProduct - 1];
@@ -44,19 +56,18 @@ var processOrder = (dbConnect, products, orders) => {
 
           if (nAmount > 0) {
             orders.push(
-              {product_name: chosenProd.product_name,
+              {item_id:      chosenProd.item_id,
+               product_name: chosenProd.product_name,
                nItems:       nAmount,
                price:        chosenProd.price
               });
 
             chosenProd.stock_quantity -= nAmount;
+            var arrParams = [nAmount, 
+                             chosenProd.item_id
+                            ];
 
-            var arrDataObj = [
-              {stock_quantity: chosenProd.stock_quantity},
-              {item_id:        chosenProd.item_id}
-            ];
-
-            return db.updateStock(dbConnect, arrDataObj).then(updateRes =>
+            return db.updateStock(dbConnect, arrParams, false).then(updateRes =>
               console.log('\n' + updateRes.affectedRows + ' item updated!\n')
             );
           }

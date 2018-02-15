@@ -73,11 +73,12 @@ var getProducts = connection =>
     )
   );
 
-var updateStock = (connection, arrDataObj) =>
-  new Promise((resolve, reject) =>
+var updateStock = (connection, arrParams, isAdd = false) =>
+  new Promise((resolve, reject) => 
     connection.query(
-      'UPDATE products SET ? WHERE ?',
-      arrDataObj,
+      'UPDATE products SET stock_quantity = stock_quantity ' 
+        + (isAdd ? '+' : '-') + ' ? WHERE item_id = ?',
+      arrParams,
       (err, res) => err ? reject(err) : resolve(res)
     )
   );
