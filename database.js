@@ -9,7 +9,8 @@ var getConnection = () =>
       {
         type: 'input',
         name: 'user',
-        message: 'Please enter your user name: '
+        message: 'Please enter your user name: ',
+        default: 'root'
       }
     ]).then(answer => {
       user = answer.user;
@@ -18,7 +19,8 @@ var getConnection = () =>
         {
           type: 'password',
           name: 'password',
-          message: 'Please enter your password: '
+          message: 'Please enter your password: ',
+          default: 'root'
         }
       ]).then(answer => {
         password = answer.password;
@@ -28,6 +30,7 @@ var getConnection = () =>
             type: 'input',
             name: 'port',
             message: 'Please enter your port number: ',
+            default: '3308',
             validate: value => {
               if (isNaN(value) === false && parseInt(value) >= 0) {
                 return true;
