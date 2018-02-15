@@ -6,9 +6,10 @@ var util     = require('./util');
 var resolveQuit = (dbConnect, orders) => 
   Promise.all(orders.map(order => {
     var arrParams = [order.nItems, order.item_id];
-    
-    return db.updateStock(dbConnect, arrParams, true).then(updateRes =>
-      console.log('\n' + updateRes.affectedRows + ' item updated!\n')
+
+    return db.updateInventory(dbConnect, arrParams, '+')
+      .then(updateRes =>
+        console.log('\n' + updateRes.affectedRows + ' item updated!\n')
     );
   }));
 
@@ -47,7 +48,7 @@ var processOrder = (dbConnect, products, orders) => {
             validate: value =>
               (isNaN(value) === false 
                && parseInt(value) >= 0 && parseInt(value) <= stockAmt) 
-              || 'You need to enter a number between 0 and ' + stockAmt + '.'
+              || '\nYou need to enter a number between 0 and ' + stockAmt + '.\n'
           }
         ])
         .then(answer => {
@@ -64,8 +65,9 @@ var processOrder = (dbConnect, products, orders) => {
             chosenProd.stock_quantity -= nAmount;
             var arrParams = [nAmount, chosenProd.item_id];
 
-            return db.updateStock(dbConnect, arrParams, false).then(updateRes =>
-              console.log('\n' + updateRes.affectedRows + ' item updated!\n')
+            return db.updateInventory(dbConnect, arrParams, '-')
+              .then(updateRes =>
+                console.log('\n' + updateRes.affectedRows + ' item updated!\n')
             );
           }
         })

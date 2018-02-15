@@ -23,7 +23,53 @@ var viewInventory = dbConnect => {
 };
 
 var addInventory = dbConnect => {
+  db.getProducts(dbConnect)
+    .then(products => {
+      util.printProducts(products, true);
+      return Promise.resolve(products);
+    })
+    .then((products) => {
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'product',
+          message: 'Enter the product number you wish to update inventory:\n',
+          validate: value =>
+            (isNaN(value) === false 
+             && parseInt(value) >= 0 && parseInt(value) <= products.length)
+            || '\nYou have to input a valid number.\n'
+        }
+      ])
+      .then(answer => {
+        var nProduct = parseInt(answer.product);
+        chosenProd = products[nProduct - 1];
 
+        inquirer.prompt([
+          {
+            type: 'input',
+            name: 'amount',
+            message: 'How many items do you want to add?\n',
+            validate: value =>
+              (isNaN(value) === false && parseInt(value) >= 0) 
+              || '\nYou have to input a valid number.\n'
+          }
+        ])
+        .then(answer => {
+          var nAmount = parseInt(answer.amount);
+
+          if (nAmount > 0) {
+            var arrParams = [nAmount, chosenProd.item_id];
+
+            return db.updateInventory(dbConnect, arrParams, '+')
+              .then(updateRes =>
+                console.log('\n' + updateRes.affectedRows + ' item updated!\n')
+            );
+          }
+        })
+        .then(() => promptUser(dbConnect));
+      });
+    })
+    .catch(error => console.log(error));
 };
 
 var addProduct = dbConnect => {

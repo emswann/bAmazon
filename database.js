@@ -82,11 +82,11 @@ var getLowInventory = (connection, arrParams) =>
     )
   );
 
-var updateStock = (connection, arrParams, isAdd = false) =>
+var updateInventory = (connection, arrParams, operator) =>
   new Promise((resolve, reject) => 
     connection.query(
       'UPDATE products SET stock_quantity = stock_quantity ' 
-        + (isAdd ? '+' : '-') + ' ? WHERE item_id = ?',
+        + operator + ' ? WHERE item_id = ?',
       arrParams,
       (err, res) => err ? reject(err) : resolve(res)
     )
@@ -97,5 +97,5 @@ module.exports = {
   endConnection,
   getProducts,
   getLowInventory,
-  updateStock
+  updateInventory
 };
