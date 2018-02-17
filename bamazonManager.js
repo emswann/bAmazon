@@ -175,16 +175,12 @@ var promptUser = dbConnect => {
   });
 };
 
-var start = () => {
-  var dbConnect;
+var dbConnect;
 
-  db.getConnection().then(connection => {
-    dbConnect = connection;
-    console.log('\nConnected as id ' + dbConnect.threadId + '\n');
-  })
-  .then(() => promptUser(dbConnect)
-  )
-  .catch(error => console.log(error));
-};
-
-start();
+db.getConnection().then(connection => {
+  dbConnect = connection;
+  console.log('\nConnected as id ' + dbConnect.threadId + '\n');
+})
+.then(() => promptUser(dbConnect)
+)
+.catch(error => console.log(error));

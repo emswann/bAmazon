@@ -93,18 +93,14 @@ var processOrder = (dbConnect, products, orders) => {
   .catch(error => console.log(error));
 };
 
-var start = () => {
-  var dbConnect;
-  var orders = [];
+var dbConnect;
+var orders = [];
 
-  db.getConnection().then(connection => {
-    dbConnect = connection;
-    console.log('\nConnected as id ' + dbConnect.threadId + '\n');
-    return db.getProducts(dbConnect);
-  })
-  .then(products => processOrder(dbConnect, products, orders)
-  )
-  .catch(error => console.log(error));
-};
-
-start();
+db.getConnection().then(connection => {
+  dbConnect = connection;
+  console.log('\nConnected as id ' + dbConnect.threadId + '\n');
+  return db.getProducts(dbConnect);
+})
+.then(products => processOrder(dbConnect, products, orders)
+)
+.catch(error => console.log(error));
