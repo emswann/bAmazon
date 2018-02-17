@@ -7,8 +7,10 @@ var viewProducts = dbConnect => {
   console.log('\n\nYour list of products for sale:\n');
 
   db.getProducts(dbConnect)
-    .then(products => util.printProducts(products, true))
-    .then(() => promptUser(dbConnect));
+    .then(products => {
+      util.printProducts(products, true);
+      promptUser(dbConnect);
+    });
 };
 
 var viewInventory = dbConnect => {
@@ -18,17 +20,16 @@ var viewInventory = dbConnect => {
   var arrParams = [LIMIT];
 
   db.getLowInventory(dbConnect, arrParams)
-    .then(products => util.printProducts(products, true))
-    .then(() => promptUser(dbConnect));
+    .then(products => {
+      util.printProducts(products, true)
+      promptUser(dbConnect);
+    });
 };
 
 var addInventory = dbConnect => {
   db.getProducts(dbConnect)
     .then(products => {
       util.printProducts(products, true);
-      return Promise.resolve(products);
-    })
-    .then((products) => {
       inquirer.prompt([
         {
           type: 'input',
@@ -175,12 +176,8 @@ var promptUser = dbConnect => {
   });
 };
 
-var dbConnect;
-
-db.getConnection().then(connection => {
-  dbConnect = connection;
+db.getConnection().then(dbConnect => {
   console.log('\nConnected as id ' + dbConnect.threadId + '\n');
+  promptUser(dbConnect);
 })
-.then(() => promptUser(dbConnect)
-)
 .catch(error => console.log(error));

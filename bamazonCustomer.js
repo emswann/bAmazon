@@ -79,28 +79,27 @@ var processOrder = (dbConnect, products, orders) => {
               message: 'Would you like to purchase another item?\n'
             }
           ])
-          .then(answer =>
-            answer.orderAgain 
-              ? processOrder(dbConnect, products, orders) 
-              : Promise.resolve(util.printOrder(orders)).then(() => {
-                console.log('\nDisconnected as id ' + dbConnect.threadId);
-                db.endConnection(dbConnect);
-              })
-          );
+          .then(answer => {
+            if (answer.orderAgain) {
+              processOrder(dbConnect, products, orders);
+            }
+            else {
+              util.printOrder(orders);
+              console.log('\nDisconnected as id ' + dbConnect.threadId);
+              db.endConnection(dbConnect);
+            }
+          });
         })
     } 
   })
   .catch(error => console.log(error));
 };
 
-var dbConnect;
-var orders = [];
-
-db.getConnection().then(connection => {
-  dbConnect = connection;
+db.getConnection().then(dbConnect => {
   console.log('\nConnected as id ' + dbConnect.threadId + '\n');
-  return db.getProducts(dbConnect);
+  db.getProducts(dbConnect).then(products => {
+    var orders = [];
+    processOrder(dbConnect, products, orders)
+  });
 })
-.then(products => processOrder(dbConnect, products, orders)
-)
 .catch(error => console.log(error));
