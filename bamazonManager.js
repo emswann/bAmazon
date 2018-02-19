@@ -87,10 +87,8 @@ var addProduct = dbConnect =>
     product_name = answer.product;
 
     db.getDepartments(dbConnect).then(departments => {
-      var arrDepartments = [];
-
-      departments.forEach(
-        department => arrDepartments.push(department.department_name));
+      var arrDepartments = departments.map(
+        department => department.department_name);
 
       inquirer.prompt([
         {
