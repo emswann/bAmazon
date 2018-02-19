@@ -72,6 +72,26 @@ var getProducts = connection =>
     )
   );
 
+var getDepartments = connection =>
+  new Promise((resolve, reject) =>
+    connection.query(
+      'SELECT * FROM departments ORDER BY department_id',
+      (err, res) => err ? reject(err) : resolve(res)
+    )
+  );
+
+var getDepartmentSales = connection =>
+  new Promise((resolve, reject) =>
+    connection.query(
+      'SELECT a.department_id, a.department_name, ' 
+      + 'a.over_head_costs, SUM(b.product_sales) AS product_sales '
+      + 'FROM departments AS a '
+      + 'LEFT JOIN products AS b ON a.department_name = b.department_name ' 
+      + 'GROUP BY a.department_id',
+      (err, res) => err ? reject(err) : resolve(res)
+    )
+  );
+
 var getLowInventory = (connection, arrParams) =>
   new Promise((resolve, reject) =>
     connection.query(
@@ -81,15 +101,24 @@ var getLowInventory = (connection, arrParams) =>
     )
   );
 
-var updateInventory = (connection, arrParams, operator) =>
-  new Promise((resolve, reject) => 
+var updateInventory = (connection, arrParams, action = 'sub') =>
+  new Promise((resolve, reject) => {
+    var quantity_op = '-';
+    var sales_op    = '+';
+
+    if (action === 'add') {
+      quantity_op = '+';
+      sales_op    = '-';
+    }
+
     connection.query(
       'UPDATE products SET stock_quantity = stock_quantity ' 
-        + operator + ' ? WHERE item_id = ?',
+        + quantity_op + ' ?, product_sales = products_sales ' 
+        + sales_op + '? WHERE item_id = ?',
       arrParams,
       (err, res) => err ? reject(err) : resolve(res)
     )
-  );
+  });
 
 var insertProduct = (connection, objData) =>
   new Promise((resolve, reject) =>
@@ -100,11 +129,23 @@ var insertProduct = (connection, objData) =>
     )
   );
 
+var insertDepartment = (connection, objData) =>
+  new Promise((resolve, reject) =>
+    connection.query(
+      'INSERT INTO departments SET ?',
+      objData,
+      (err, res) => err ? reject(err) : resolve(res)
+    )
+  );
+
 module.exports = {
   getConnection,
   endConnection,
   getProducts,
+  getDepartments,
+  getDepartmentSales,
   getLowInventory,
   updateInventory,
-  insertProduct
+  insertProduct,
+  insertDepartment
 };

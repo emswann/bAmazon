@@ -86,55 +86,63 @@ var addProduct = dbConnect =>
     
     product_name = answer.product;
 
-    inquirer.prompt([
-      {
-        type: 'input',
-        name: 'department',
-        message: 'Enter the product department\n'
-      }
-    ])
-    .then(answer => {
-      department_name = answer.department;
+    db.getDepartments(dbConnect).then(departments => {
+      var arrDepartments = [];
+
+      departments.forEach(
+        department => arrDepartments.push(department.department_name));
 
       inquirer.prompt([
         {
-          type: 'input',
-          name: 'price',
-          message: 'Enter the product cost:\n',
-          validate: value =>
-            (isNaN(value) === false && parseInt(value) > 0) 
-            || '\nYou have to input a valid number.\n'
+          type: 'rawlist',
+          name: 'department',
+          message: 'Select the product department\n',
+          choices: arrDepartments
         }
       ])
       .then(answer => {
-        price = answer.price;
+        department_name = answer.department;
 
         inquirer.prompt([
           {
             type: 'input',
-            name: 'amount',
-            message: 'Enter the number of products available:\n',
+            name: 'price',
+            message: 'Enter the product cost:\n',
             validate: value =>
               (isNaN(value) === false && parseInt(value) > 0) 
               || '\nYou have to input a valid number.\n'
           }
         ])
         .then(answer => {
-          stock_quantity = answer.amount;
+          price = answer.price;
 
-          var objData = {
-            product_name:    product_name,
-            department_name: department_name,
-            price:           price,
-            stock_quantity:  stock_quantity
-          };
+          inquirer.prompt([
+            {
+              type: 'input',
+              name: 'amount',
+              message: 'Enter the number of products available:\n',
+              validate: value =>
+                (isNaN(value) === false && parseInt(value) > 0) 
+                || '\nYou have to input a valid number.\n'
+            }
+          ])
+          .then(answer => {
+            stock_quantity = answer.amount;
 
-          return db.insertProduct(dbConnect, objData)
-            .then(updateRes =>
-              console.log('\n' + updateRes.affectedRows + ' item inserted!\n')
-            );
-        })
-        .then(() => promptUser(dbConnect));
+            var objData = {
+              product_name:    product_name,
+              department_name: department_name,
+              price:           price,
+              stock_quantity:  stock_quantity
+            };
+
+            return db.insertProduct(dbConnect, objData)
+              .then(updateRes =>
+                console.log('\n' + updateRes.affectedRows + ' item inserted!\n')
+              );
+          })
+          .then(() => promptUser(dbConnect));
+        });
       });
     });
   })
@@ -142,7 +150,7 @@ var addProduct = dbConnect =>
 
 var promptUser = dbConnect => {
   var arrActions = ['View Products for Sale', 'View Low Inventory',
-                      'Add to Inventory', 'Add New Product', 'Quit'];
+                    'Add to Inventory', 'Add New Product', 'Quit'];
 
   inquirer.prompt([
     {

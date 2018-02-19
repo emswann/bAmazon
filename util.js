@@ -41,7 +41,25 @@ var printOrder = orders => {
   console.log('\nYour grand total is: $' + sumTotal.toFixed(2) + '\n');
 };
 
+var printDepartments = departments => {
+  var table = new Table;
+
+  departments.forEach(department =>  {
+    table.cell('ID', department.department_id);
+    table.cell('Name', department.department_name);
+    table.cell('Overhead Costs', department.over_head_costs, Table.number(2));
+    table.cell('Product Sales', department.product_sales, Table.number(2));
+    table.cell('Total Profit', 
+               department.product_sales - department.over_head_costs, 
+               Table.number(2));
+    table.newRow();
+  });
+
+  console.log('\n' + table.toString() + '\n');
+};
+
 module.exports = {
   printProducts,
-  printOrder
+  printOrder,
+  printDepartments
 };
