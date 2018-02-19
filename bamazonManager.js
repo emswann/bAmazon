@@ -59,9 +59,9 @@ var addInventory = dbConnect => {
           var nAmount = parseInt(answer.amount);
 
           if (nAmount > 0) {
-            var arrParams = [nAmount, chosenProd.item_id];
+            var arrParams = [nAmount, 0, chosenProd.id];
 
-            return db.updateInventory(dbConnect, arrParams, '+')
+            return db.updateInventory(dbConnect, arrParams, 'add')
               .then(updateRes =>
                 console.log('\n' + updateRes.affectedRows + ' item updated!\n')
             );
@@ -82,13 +82,13 @@ var addProduct = dbConnect =>
     }
   ])
   .then(answer => {
-    var product_name, department_name, price, stock_quantity;
+    var product_name, price, stock_quantity;
     
     product_name = answer.product;
 
     db.getDepartments(dbConnect).then(departments => {
       var arrDepartments = departments.map(
-        department => department.department_name);
+        department => department.name);
 
       inquirer.prompt([
         {
@@ -99,7 +99,9 @@ var addProduct = dbConnect =>
         }
       ])
       .then(answer => {
-        department_name = answer.department;
+        var department = departments.filter(
+                           department => department.name === answer.department);
+        var department_id = department[0].id;
 
         inquirer.prompt([
           {
@@ -128,10 +130,10 @@ var addProduct = dbConnect =>
             stock_quantity = answer.amount;
 
             var objData = {
-              product_name:    product_name,
-              department_name: department_name,
-              price:           price,
-              stock_quantity:  stock_quantity
+              name:           product_name,
+              department_id:  department_id,
+              price:          price,
+              stock_quantity: stock_quantity
             };
 
             return db.insertProduct(dbConnect, objData)

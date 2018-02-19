@@ -7,7 +7,7 @@ var resolveQuit = (dbConnect, orders) =>
   Promise.all(orders.map(order => {
     var arrParams = [order.nItems, 
                      order.price * order.nItems,
-                     order.citem_id];
+                     order.id];
 
     return db.updateInventory(dbConnect, arrParams, 'add')
       .then(updateRes =>
@@ -40,34 +40,34 @@ var processOrder = (dbConnect, products, orders) => {
         break;
       default:
         chosenProd = products[nProduct - 1];
-        var stockAmt = chosenProd.stock_quantity;
+        var stockQuantity = chosenProd.stock_quantity;
 
         inquirer.prompt([
           {
             type: 'input',
             name: 'amount',
-            message: 'We have ' + stockAmt + ' in stock. How many items would you like to purchase?\n',
+            message: 'We have ' + stockQuantity + ' in stock. How many items would you like to purchase?\n',
             validate: value =>
               (isNaN(value) === false 
-               && parseInt(value) >= 0 && parseInt(value) <= stockAmt) 
-              || '\nYou need to enter a number between 0 and ' + stockAmt + '.\n'
+               && parseInt(value) >= 0 && parseInt(value) <= stockQuantity) 
+              || '\nYou need to enter a number between 0 and ' + stockQuantity + '.\n'
           }
         ])
         .then(answer => {
-          var nAmount = parseInt(answer.amount);
+          var nItems = parseInt(answer.amount);
 
-          if (nAmount > 0) {
+          if (nItems > 0) {
             orders.push(
-              {item_id:      chosenProd.item_id,
+              {id:           chosenProd.id,
                product_name: chosenProd.product_name,
-               nItems:       nAmount,
+               nItems:       nItems,
                price:        chosenProd.price
               });
 
-            chosenProd.stock_quantity -= nAmount;
-            var arrParams = [nAmount, 
-                             chosenProd.price * nAmount, 
-                             chosenProd.item_id];
+            chosenProd.stock_quantity -= nItems;
+            var arrParams = [nItems, 
+                             chosenProd.price * nItems, 
+                             chosenProd.id];
 
             return db.updateInventory(dbConnect, arrParams, 'sub')
               .then(updateRes =>

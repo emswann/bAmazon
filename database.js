@@ -67,7 +67,11 @@ var endConnection = connection =>
 var getProducts = connection =>
   new Promise((resolve, reject) =>
     connection.query(
-      'SELECT * FROM products ORDER BY item_id',
+      'SELECT a.id, a.name AS product_name, b.name AS department_name, '
+      + '     a.price, a.stock_quantity, a.sales '
+      + 'FROM products AS a '
+      + 'LEFT JOIN departments AS b ON a.department_id = b.id ' 
+      + 'ORDER BY a.id',
       (err, res) => err ? reject(err) : resolve(res)
     )
   );
@@ -75,7 +79,8 @@ var getProducts = connection =>
 var getDepartments = connection =>
   new Promise((resolve, reject) =>
     connection.query(
-      'SELECT * FROM departments ORDER BY department_id',
+      'SELECT * FROM departments '
+      + ' ORDER BY id',
       (err, res) => err ? reject(err) : resolve(res)
     )
   );
@@ -83,19 +88,23 @@ var getDepartments = connection =>
 var getDepartmentSales = connection =>
   new Promise((resolve, reject) =>
     connection.query(
-      'SELECT a.department_id, a.department_name, ' 
-      + 'a.over_head_costs, SUM(b.product_sales) AS product_sales '
+      'SELECT a.id, a.name, a.over_head_costs, SUM(b.sales) AS sales '
       + 'FROM departments AS a '
-      + 'LEFT JOIN products AS b ON a.department_name = b.department_name ' 
-      + 'GROUP BY a.department_id',
+      + 'LEFT JOIN products AS b ON a.id = b.department_id ' 
+      + 'GROUP BY a.id',
       (err, res) => err ? reject(err) : resolve(res)
     )
   );
 
 var getLowInventory = (connection, arrParams) =>
-  new Promise((resolve, reject) =>
+  new Promise((resolve, reject) => 
     connection.query(
-      'SELECT * FROM products WHERE stock_quantity < ? ORDER BY item_id',
+      'SELECT a.id, a.name AS product_name, b.name AS department_name, '
+      + '     a.price, a.stock_quantity, a.sales '
+      + 'FROM products AS a '
+      + 'LEFT JOIN departments AS b ON a.department_id = b.id '
+      + 'WHERE a.stock_quantity < ? ' 
+      + 'ORDER BY a.id',
       arrParams,
       (err, res) => err ? reject(err) : resolve(res)
     )
@@ -103,18 +112,19 @@ var getLowInventory = (connection, arrParams) =>
 
 var updateInventory = (connection, arrParams, action = 'sub') =>
   new Promise((resolve, reject) => {
-    var quantity_op = '-';
-    var sales_op    = '+';
+    var quantity_operator = '-';
+    var sales_operator    = '+';
 
     if (action === 'add') {
-      quantity_op = '+';
-      sales_op    = '-';
+      quantity_operator = '+';
+      sales_operator    = '-';
     }
 
     connection.query(
-      'UPDATE products SET stock_quantity = stock_quantity ' 
-        + quantity_op + ' ?, product_sales = products_sales ' 
-        + sales_op + '? WHERE item_id = ?',
+      'UPDATE products '
+        + 'SET stock_quantity = stock_quantity ' + quantity_operator + ' ?, '
+        + '    sales = sales ' + sales_operator + '? '
+        + 'WHERE id = ?',
       arrParams,
       (err, res) => err ? reject(err) : resolve(res)
     )

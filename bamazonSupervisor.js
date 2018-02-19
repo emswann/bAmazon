@@ -36,7 +36,7 @@ var addDepartment = dbConnect =>
       over_head_costs = answer.costs;
 
       var objData = {
-        department_name: department_name,
+        name:            department_name,
         over_head_costs: over_head_costs
       };
 
