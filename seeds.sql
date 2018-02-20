@@ -1,13 +1,12 @@
-DROP DATABASE IF EXISTS bamazon;
-CREATE DATABASE bamazon;
+-- SQL seeds file used to populate the bAmazon application tables with data.
+-- NAME: seeds.sql
+-- AUTHOR: Elaina Swann
+-- DATE: 02/24/2018
+-- REVISION LOG:
+
 USE bamazon;
 
-CREATE TABLE departments(
-  id              INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-  name            VARCHAR(40),
-  over_head_costs DECIMAL(8,4) DEFAULT 0
-);
-
+-- Populate departments table.
 INSERT INTO departments (name, over_head_costs)
 VALUES ('Pets', 500);
 
@@ -20,19 +19,7 @@ VALUES ('Electronics', 1500);
 INSERT INTO departments (name, over_head_costs)
 VALUES ('Books', 100);
 
-CREATE TABLE products(
-  id             INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-  name           VARCHAR(40),
-  department_id  INT,
-  price          DECIMAL(8,4),
-  stock_quantity INT,
-  sales          DECIMAL(8,4) DEFAULT 0,
-  INDEX department_id_index (department_id),
-  CONSTRAINT fk_department_id 
-    FOREIGN KEY (department_id)
-    REFERENCES departments(id)
-);
-
+-- Populate products table.
 INSERT INTO products (name, department_id, price, stock_quantity)
 VALUES ('Purina Cat Chow', 1, 11.29, 100);
 

@@ -1,6 +1,17 @@
+/**
+ * @file Interface to database. 
+ * @author Elaina Swann
+ * @version 1.0 
+*/
+
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 
+/** 
+ * @function getConnection 
+ * @description Promise function for creating database connection. Allows user input for user name, password, and port.
+ * @returns {Promise} Connection data object.
+*/
 var getConnection = () =>
   new Promise((resolve, reject) => {
     var connection, user, password, port;
@@ -59,11 +70,23 @@ var getConnection = () =>
     .catch(error => console.log(error));
   });
 
+/** 
+ * @function endConnection 
+ * @description Promise function to end database connection.
+ * @param {object} connection Connection object.
+ * @returns {Promise} 1 or error.
+*/
 var endConnection = connection =>
   new Promise((resolve, reject) =>
     connection.end(err => err ? reject(err) : resolve(1))
   );
 
+/** 
+ * @function getProducts 
+ * @description Promise function for selecting products from products table.
+ * @param {object} connection Connection object.
+ * @returns {Promise} List of products or error.
+*/
 var getProducts = connection =>
   new Promise((resolve, reject) =>
     connection.query(
@@ -76,6 +99,12 @@ var getProducts = connection =>
     )
   );
 
+/** 
+ * @function getDepartments 
+ * @description Promise function for selecting departments from departments table.
+ * @param {object} connection Connection object.
+ * @returns {Promise} List of departments or error.
+*/
 var getDepartments = connection =>
   new Promise((resolve, reject) =>
     connection.query(
@@ -85,10 +114,16 @@ var getDepartments = connection =>
     )
   );
 
+/** 
+ * @function getDepartmentSales
+ * @description Promise function for selecting sales data from departments table.
+ * @param {object} connection Connection object.
+ * @returns {Promise} List of departments with sales data or error.
+*/
 var getDepartmentSales = connection =>
   new Promise((resolve, reject) =>
     connection.query(
-      'SELECT a.id, a.name, a.over_head_costs, SUM(b.sales) AS sales '
+      'SELECT a.id, a.name, a.over_head_costs, SUM(IFNULL(0, b.sales)) AS sales '
       + 'FROM departments AS a '
       + 'LEFT JOIN products AS b ON a.id = b.department_id ' 
       + 'GROUP BY a.id',
@@ -96,6 +131,13 @@ var getDepartmentSales = connection =>
     )
   );
 
+/** 
+ * @function getLowInventory
+ * @description Promise function for selecting list of low inventory products from products table.
+ * @param {object} connection Connection object.
+ * @param {array} arrParams Parameter array for dynamic sql.
+ * @returns {Promise} List of low inventory products or error.
+*/
 var getLowInventory = (connection, arrParams) =>
   new Promise((resolve, reject) => 
     connection.query(
@@ -110,6 +152,14 @@ var getLowInventory = (connection, arrParams) =>
     )
   );
 
+/** 
+ * @function updateInventory
+ * @description Promise function for updating inventory on products table.
+ * @param {object} connection Connection object.
+ * @param {array} arrParams Data array for dynamic sql.
+ * @param {string} action String designating with adding or subtracting inventory.
+ * @returns {Promise} Database update response object or error.
+*/
 var updateInventory = (connection, arrParams, action = 'sub') =>
   new Promise((resolve, reject) => {
     var quantity_operator = '-';
@@ -130,6 +180,13 @@ var updateInventory = (connection, arrParams, action = 'sub') =>
     )
   });
 
+/** 
+ * @function insertProduct
+ * @description Promise function for inserting new product into products table.
+ * @param {object} connection Connection object.
+ * @param {object} objData Data object for dynamic sql.
+ * @returns {Promise} Database insert response object or error.
+*/
 var insertProduct = (connection, objData) =>
   new Promise((resolve, reject) =>
     connection.query(
@@ -139,6 +196,13 @@ var insertProduct = (connection, objData) =>
     )
   );
 
+/** 
+ * @function insertDepartment
+ * @description Promise function for inserting new department into department table.
+ * @param {object} connection Connection object.
+ * @param {object} objData Data object for dynamic sql.
+ * @returns {Promise} Database insert response object or error.
+*/
 var insertDepartment = (connection, objData) =>
   new Promise((resolve, reject) =>
     connection.query(

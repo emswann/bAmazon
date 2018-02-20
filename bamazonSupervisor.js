@@ -1,14 +1,30 @@
+/**
+ * @file Interface to supervisor functionality. 
+ * @author Elaina Swann
+ * @version 1.0 
+*/
+
 var mysql    = require('mysql');
 var inquirer = require('inquirer');
 var db       = require('./database');
 var util     = require('./util');
 
+/** 
+ * @function viewDepartmentSales
+ * @description Function to handle the supervisor department sales list.
+ * @param {object} dbConnect Connection object.
+*/
 var viewDepartmentSales = dbConnect => {
   db.getDepartmentSales(dbConnect)
     .then(departments => util.printDepartments(departments, true))
     .then(() => promptUser(dbConnect));
 };
 
+/** 
+ * @function addDepartment
+ * @description Function to allow supervisor to add department to existing department list.
+ * @param {object} dbConnect Connection object.
+*/
 var addDepartment = dbConnect =>
   inquirer.prompt([
     {
@@ -18,9 +34,7 @@ var addDepartment = dbConnect =>
     }
   ])
   .then(answer => {
-    var department_name, over_head_costs;
-    
-    department_name = answer.department;
+    var department_name = answer.department;
 
     inquirer.prompt([
       {
@@ -33,7 +47,7 @@ var addDepartment = dbConnect =>
       }
     ])
     .then(answer => {
-      over_head_costs = answer.costs;
+      var over_head_costs = answer.costs;
 
       var objData = {
         name:            department_name,
@@ -49,6 +63,11 @@ var addDepartment = dbConnect =>
   })
   .catch(error => console.log(error));
 
+/** 
+ * @function promptUser
+ * @description Top-level function, called recursively, to handle supervisor requests.
+ * @param {object} dbConnect Connection object.
+*/
 var promptUser = dbConnect => {
   var arrActions = ['View Product Sales by Department', 'Create New Department',
                     'Quit'];
@@ -79,6 +98,9 @@ var promptUser = dbConnect => {
   });
 };
 
+/** 
+ * Starts processing.
+*/
 db.getConnection().then(dbConnect => {
   console.log('\nConnected as id ' + dbConnect.threadId + '\n');
   promptUser(dbConnect);

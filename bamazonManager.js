@@ -1,8 +1,19 @@
+/**
+ * @file Interface to manager functionality. 
+ * @author Elaina Swann
+ * @version 1.0 
+*/
+
 var mysql    = require('mysql');
 var inquirer = require('inquirer');
 var db       = require('./database');
 var util     = require('./util');
 
+/** 
+ * @function viewProducts
+ * @description Function to handle the manager product list view.
+ * @param {object} dbConnect Connection object.
+*/
 var viewProducts = dbConnect => {
   console.log('\n\nYour list of products for sale:\n');
 
@@ -13,6 +24,11 @@ var viewProducts = dbConnect => {
     });
 };
 
+/** 
+ * @function viewInventory
+ * @description Function to handle the manager low inventory list view.
+ * @param {object} dbConnect Connection object.
+*/
 var viewInventory = dbConnect => {
   const LIMIT = 5;
   console.log('\n\nYour list of products with low inventory:\n');
@@ -26,6 +42,11 @@ var viewInventory = dbConnect => {
     });
 };
 
+/** 
+ * @function addInventory
+ * @description Function to allow  manager to add inventory to existing product list.
+ * @param {object} dbConnect Connection object.
+*/
 var addInventory = dbConnect => {
   db.getProducts(dbConnect)
     .then(products => {
@@ -73,6 +94,11 @@ var addInventory = dbConnect => {
     .catch(error => console.log(error));
 };
 
+/** 
+ * @function addProduct
+ * @description Function to allow manager to add product to existing product list.
+ * @param {object} dbConnect Connection object.
+*/
 var addProduct = dbConnect =>
   inquirer.prompt([
     {
@@ -81,10 +107,8 @@ var addProduct = dbConnect =>
       message: 'Enter the product name:\n'
     }
   ])
-  .then(answer => {
-    var product_name, price, stock_quantity;
-    
-    product_name = answer.product;
+  .then(answer => {   
+    var product_name = answer.product;
 
     db.getDepartments(dbConnect).then(departments => {
       var arrDepartments = departments.map(
@@ -114,7 +138,7 @@ var addProduct = dbConnect =>
           }
         ])
         .then(answer => {
-          price = answer.price;
+          var price = answer.price;
 
           inquirer.prompt([
             {
@@ -127,7 +151,7 @@ var addProduct = dbConnect =>
             }
           ])
           .then(answer => {
-            stock_quantity = answer.amount;
+            var stock_quantity = answer.amount;
 
             var objData = {
               name:           product_name,
@@ -148,6 +172,11 @@ var addProduct = dbConnect =>
   })
   .catch(error => console.log(error));
 
+/** 
+ * @function promptUser
+ * @description Top-level function, called recursively, to handle manager requests.
+ * @param {object} dbConnect Connection object.
+*/
 var promptUser = dbConnect => {
   var arrActions = ['View Products for Sale', 'View Low Inventory',
                     'Add to Inventory', 'Add New Product', 'Quit'];
@@ -184,6 +213,9 @@ var promptUser = dbConnect => {
   });
 };
 
+/** 
+ * Starts processing.
+*/
 db.getConnection().then(dbConnect => {
   console.log('\nConnected as id ' + dbConnect.threadId + '\n');
   promptUser(dbConnect);

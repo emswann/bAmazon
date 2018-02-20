@@ -1,8 +1,20 @@
+/**
+ * @file Interface to customer functionality. 
+ * @author Elaina Swann
+ * @version 1.0 
+*/
+
 var mysql    = require('mysql');
 var inquirer = require('inquirer');
 var db       = require('./database');
 var util     = require('./util');
 
+/** 
+ * @function resolveQuit
+ * @description Promise function for reverting the inventory on products table when customer quits application without ordering.
+ * @param {object} dbConnect Connection object.
+ * @param {array} orders Order object array with items from customer order.
+*/
 var resolveQuit = (dbConnect, orders) => 
   Promise.all(orders.map(order => {
     var arrParams = [order.nItems, 
@@ -15,6 +27,13 @@ var resolveQuit = (dbConnect, orders) =>
     );
   }));
 
+/** 
+ * @function processOrder
+ * @description Top-level function, called recursively, as customer chooses products to order.
+ * @param {object} dbConnect Connection object.
+ * @param {array} products Product object array with rows from database.
+ * @param {array} orders Order object array with items from customer order.
+*/
 var processOrder = (dbConnect, products, orders) => {
   util.printProducts(products, false);
   inquirer.prompt([
@@ -99,6 +118,9 @@ var processOrder = (dbConnect, products, orders) => {
   .catch(error => console.log(error));
 };
 
+/** 
+ * Starts processing.
+*/
 db.getConnection().then(dbConnect => {
   console.log('\nConnected as id ' + dbConnect.threadId + '\n');
   db.getProducts(dbConnect).then(products => {

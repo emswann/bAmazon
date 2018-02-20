@@ -1,5 +1,17 @@
+/**
+ * @file Interface to print utilities. 
+ * @author Elaina Swann
+ * @version 1.0 
+*/
+
 var Table = require('easy-table');
 
+/** 
+ * @function printProducts 
+ * @description Prints product list.
+ * @param {array} products Product object array with rows from database.
+ * @param {boolean} isMgrView Determines data to print depending on whether manager or customer view.
+*/
 var printProducts = (products, isMgrView = false) => {
   if (products.length) {
     var table = new Table;
@@ -29,6 +41,12 @@ var printProducts = (products, isMgrView = false) => {
   }
 };
 
+
+/** 
+ * @function printOrder 
+ * @description Prints customer order along with total.
+ * @param {array} orders Order object array with items from customer order.
+*/
 var printOrder = orders => {
   if (orders.length) {
     var table = new Table;
@@ -54,6 +72,11 @@ var printOrder = orders => {
   }
 };
 
+/** 
+ * @function printDepartments 
+ * @description Prints department list.
+ * @param {array} departments Department object array with rows from database.
+*/
 var printDepartments = departments => {
   if (departments.length) {
     var table = new Table;
