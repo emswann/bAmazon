@@ -123,7 +123,7 @@ var getDepartments = connection =>
 var getDepartmentSales = connection =>
   new Promise((resolve, reject) =>
     connection.query(
-      'SELECT a.id, a.name, a.over_head_costs, SUM(IFNULL(0, b.sales)) AS sales '
+      'SELECT a.id, a.name, a.over_head_costs, IFNULL(SUM(b.sales), 0) AS sales '
       + 'FROM departments AS a '
       + 'LEFT JOIN products AS b ON a.id = b.department_id ' 
       + 'GROUP BY a.id',
