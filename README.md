@@ -1,5 +1,5 @@
 # bAmazon
-Amazon-like Storefront Management System - Homework #10
+Amazon-like Storefront Management System
 
 This node.js application is a command line storefront management system. It also uses mySQL to maintain product and department data for the storefront.
 
